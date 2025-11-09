@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Caches and builds
+.cache/
+frontend/.cache/
+frontend/node_modules/.cache/
+dist/
+build/
+out/
+
+# Logs and env files
+*.log
+.env
