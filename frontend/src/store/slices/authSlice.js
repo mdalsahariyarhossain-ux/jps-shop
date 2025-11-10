@@ -2,38 +2,23 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { setLoginState as setCartLogin } from './cartSlice'
 import { setLoginState as setWishlistLogin } from './wishlistSlice'
 
-// ✅ Auto-detect environment (local or deployed)
-const API_URL =
-  window.location.hostname === 'localhost'
-    ? 'http://localhost:5000/api'
-    : 'https://jps-shop-backend.vercel.app/api'
+const API_URL = 'https://jps-shop-backend.vercel.app/api'
 
-// ✅ Load saved session
+// ✅ Load session
 const savedUser = JSON.parse(sessionStorage.getItem('user'))
 const savedToken = sessionStorage.getItem('token')
 
-// 🔹 Helper for safe JSON parsing
-async function safeJsonParse(res) {
-  const text = await res.text()
-  try {
-    return JSON.parse(text)
-  } catch {
-    throw new Error('Server returned invalid response')
-  }
-}
-
-// 🔹 Register user
+// 🔹 Register
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
   async (userData, { rejectWithValue }) => {
     try {
-      const res = await fetch("${API_URL}/register", {
+      const res = await fetch(`${API_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
       })
-
-      const data = await safeJsonParse(res)
+      const data = await res.json()
       if (!res.ok) throw new Error(data.message || 'Registration failed')
       return data
     } catch (err) {
@@ -42,25 +27,24 @@ export const registerUser = createAsyncThunk(
   }
 )
 
-// 🔹 Login user
+// 🔹 Login
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (credentials, { dispatch, rejectWithValue }) => {
     try {
-      const res = await fetch("${API_URL}/login", {
+      const res = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
       })
-
-      const data = await safeJsonParse(res)
+      const data = await res.json()
       if (!res.ok) throw new Error(data.message || 'Login failed')
 
-      // ✅ Merge local + server user
+      // ✅ Merge session user with server user if exists
       const localUser = JSON.parse(sessionStorage.getItem('user'))
       const mergedUser = localUser ? { ...data.user, ...localUser } : data.user
 
-      // ✅ Store user & token
+      // ✅ Store user and token in sessionStorage
       sessionStorage.setItem('user', JSON.stringify(mergedUser))
       sessionStorage.setItem('token', data.token)
 
@@ -100,11 +84,15 @@ const authSlice = createSlice({
         sessionStorage.setItem('user', JSON.stringify(state.user))
       }
     },
+
+    // ✅ Store correct image path after upload
     updateProfilePic: (state, action) => {
       if (state.user) {
+        // backend sends `/uploads/profiles/filename.jpg`
         const profilePath = action.payload
         state.user.profilePic = profilePath
-        state.user.profileImage = profilePath
+        state.user.profileImage = profilePath // keep both consistent
+
         sessionStorage.setItem('user', JSON.stringify(state.user))
       }
     },
