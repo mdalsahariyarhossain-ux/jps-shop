@@ -1,34 +1,26 @@
 const express = require('express');
-const dotenv = require('dotenv');
+const mongoose = require('mongoose');
 const cors = require('cors');
-const connectDB = require('./db');
-const cookieParser = require('cookie-parser');
-
+const dotenv = require('dotenv');
 dotenv.config();
-connectDB();
 
 const app = express();
-
-// ✅ CORS configuration
-app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true,
-}));
-
+app.use(cors());
 app.use(express.json());
-app.use(cookieParser());
 
-// Routes
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.log(err));
+
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/products', require('./routes/products'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/payment', require('./routes/payment'));
 app.use('/api/admin', require('./routes/admin'));
 
-// Health check
-app.get('/', (req, res) => {
-  res.send('✅ Backend is running!');
+app.get("/", (req, res) => {
+  res.send("✅ JPS backend is running successfully!");
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
