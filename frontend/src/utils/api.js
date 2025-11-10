@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'https://jps-shop-backend.vercel.app',
+  baseURL: process.env.REACT_APP_API_URL || 'https://jps-shop-80ex.onrender.com',
   withCredentials: true
 });
 

@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { setLoginState as setCartLogin } from './cartSlice'
 import { setLoginState as setWishlistLogin } from './wishlistSlice'
 
-const API_URL = 'https://jps-shop-backend.vercel.app'
+const API_URL = 'https://jps-shop-80ex.onrender.com'
 
 // ✅ Load session
 const savedUser = JSON.parse(sessionStorage.getItem('user'))
