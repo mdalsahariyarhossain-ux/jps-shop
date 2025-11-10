@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { setLoginState as setCartLogin } from './cartSlice'
 import { setLoginState as setWishlistLogin } from './wishlistSlice'
 
-const API_URL = 'https://jps-shop-80ex.onrender.com'
+const API_URL = process.env.REACT_APP_API_URL || 'https://jps-shop-80ex.onrender.com';
 
 // ✅ Load session
 const savedUser = JSON.parse(sessionStorage.getItem('user'))
@@ -18,7 +18,15 @@ export const registerUser = createAsyncThunk(
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
       })
-      const data = await res.json()
+      const text = await res.text();
+let data;
+
+try {
+  data = JSON.parse(text);
+} catch (e) {
+  throw new Error('Server returned non-JSON response. Check backend route or URL.');
+}
+
       if (!res.ok) throw new Error(data.message || 'Registration failed')
       return data
     } catch (err) {
@@ -37,7 +45,15 @@ export const loginUser = createAsyncThunk(
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
       })
-      const data = await res.json()
+      const text = await res.text();
+let data;
+
+try {
+  data = JSON.parse(text);
+} catch (e) {
+  throw new Error('Server returned non-JSON response. Check backend route or URL.');
+}
+
       if (!res.ok) throw new Error(data.message || 'Login failed')
 
       // ✅ Merge session user with server user if exists
