@@ -5,7 +5,11 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors(
+  { origin: process.env.FRONTEND_URL || 'https://jps-shop.vercel.app.com',
+    credentials: true
+  }
+));
 app.use(express.json());
 
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
