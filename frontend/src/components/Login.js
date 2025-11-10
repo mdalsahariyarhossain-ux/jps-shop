@@ -14,18 +14,8 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    try {
-      const result = await dispatch(loginUser({ email, password }))
-
-      // Check if login was fulfilled
-      if (loginUser.fulfilled.match(result)) {
-        navigate('/') // redirect after successful login
-      } else {
-        console.error(result.payload || result.error)
-      }
-    } catch (err) {
-      console.error('Unexpected error:', err)
-    }
+    const result = await dispatch(loginUser({ email, password }))
+    if (!result.error) navigate('/')
   }
 
   return (

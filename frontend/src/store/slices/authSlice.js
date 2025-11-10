@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import api from '../../api' // import your axios instance
 import { setLoginState as setCartLogin } from './cartSlice'
 import { setLoginState as setWishlistLogin } from './wishlistSlice'
+
+const API_URL = 'https://jps-shop-backend.vercel.app/auth'
 
 // ✅ Load session
 const savedUser = JSON.parse(sessionStorage.getItem('user'))
@@ -12,11 +13,16 @@ export const registerUser = createAsyncThunk(
   'auth/registerUser',
   async (userData, { rejectWithValue }) => {
     try {
-      const { data } = await api.post('/auth/register', userData)
+      const res = await fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Registration failed')
       return data
     } catch (err) {
-      // Axios error handling
-      return rejectWithValue(err.response?.data?.message || err.message)
+      return rejectWithValue(err.message)
     }
   }
 )
@@ -26,13 +32,19 @@ export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async (credentials, { dispatch, rejectWithValue }) => {
     try {
-      const { data } = await api.post('/auth/login', credentials)
+      const res = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Login failed')
 
-      // Merge session user with server user if exists
+      // ✅ Merge session user with server user if exists
       const localUser = JSON.parse(sessionStorage.getItem('user'))
       const mergedUser = localUser ? { ...data.user, ...localUser } : data.user
 
-      // Store user and token in sessionStorage
+      // ✅ Store user and token in sessionStorage
       sessionStorage.setItem('user', JSON.stringify(mergedUser))
       sessionStorage.setItem('token', data.token)
 
@@ -41,7 +53,7 @@ export const loginUser = createAsyncThunk(
 
       return { ...data, user: mergedUser }
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message || err.message)
+      return rejectWithValue(err.message)
     }
   }
 )
@@ -72,11 +84,15 @@ const authSlice = createSlice({
         sessionStorage.setItem('user', JSON.stringify(state.user))
       }
     },
+
+    // ✅ Store correct image path after upload
     updateProfilePic: (state, action) => {
       if (state.user) {
+        // backend sends `/uploads/profiles/filename.jpg`
         const profilePath = action.payload
         state.user.profilePic = profilePath
-        state.user.profileImage = profilePath
+        state.user.profileImage = profilePath // keep both consistent
+
         sessionStorage.setItem('user', JSON.stringify(state.user))
       }
     },

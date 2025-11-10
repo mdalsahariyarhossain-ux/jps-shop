@@ -19,18 +19,8 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     const newUser = { name, email, password, number, dob, gender }
-
-    try {
-      const result = await dispatch(registerUser(newUser))
-
-      if (registerUser.fulfilled.match(result)) {
-        navigate('/login') // redirect after successful registration
-      } else {
-        console.error(result.payload || result.error)
-      }
-    } catch (err) {
-      console.error('Unexpected error:', err)
-    }
+    const result = await dispatch(registerUser(newUser))
+    if (!result.error) navigate('/login')
   }
 
   return (
