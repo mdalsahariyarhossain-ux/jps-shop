@@ -6,7 +6,7 @@ const User = require('../models/User')
 const auth = require('../middleware/auth')
 
 const router = express.Router()
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key'
+const JWT_SECRET = process.env.JWT_SECRET || '98bc6b0377cecb2ff3af36e582b80a89e2223e7ecd88e6dbe0cf738b5c88dd37f2263e082457b22d74e81f12586492ebc35c41afc9db17df47790ef34d4027b8'
 
 // 📌 Register user
 router.post(
