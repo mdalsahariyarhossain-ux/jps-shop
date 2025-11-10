@@ -19,7 +19,7 @@ app.use('/api/payment', require('./routes/payment'));
 app.use('/api/admin', require('./routes/admin'));
 
 app.get("/", (req, res) => {
-  res.send("✅ JPS backend is running successfully on Render!");
+  res.send("✅ JPS backend is running successfully!");
 });
 
 const PORT = process.env.PORT || 5000;
